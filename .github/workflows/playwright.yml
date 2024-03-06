@@ -63,7 +63,7 @@ jobs:
           --project-id 1 \
           --name "Playwright test run" \
           --source "frontend" \
-          --results results/*.xml
+          --results test-results/*.xml
           -- npx playwright test
       env:
         TESTMO_URL: ${{ secrets.TESTMO_URL }}
