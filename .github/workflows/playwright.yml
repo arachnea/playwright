@@ -15,8 +15,32 @@ jobs:
         node-version: lts/*
     - name: Install dependencies
       run: npm ci
+    - name: Install Testmo CLI
+      run: npm install --no-save @testmo/testmo-cli
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+
+    - run: |
+          npx testmo automation:resources:add-field --name git --type string \
+            --value ${GITHUB_SHA:0:7} --resources resources.json
+          RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          npx testmo automation:resources:add-link --name build \
+            --url $RUN_URL --resources resources.json
+
+    - run: |
+        if [[ -z "${TESTMO_URL}" ]]; then
+          echo "The TESTMO_URL secret is not defined for this repository"
+          exit 1
+        fi
+
+        if [[ -z "${TESTMO_TOKEN}" ]]; then
+          echo "The TESTMO_TOKEN secret is not defined for this repository"
+          exit 1
+        fi
+      env:
+          TESTMO_URL: ${{ secrets.TESTMO_URL }}
+          TESTMO_TOKEN: ${{ secrets.TESTMO_TOKEN }}        
+
     - name: Run Playwright tests
       run: npx playwright test
     - uses: actions/upload-artifact@v4
@@ -25,3 +49,14 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+
+    - run: |
+        npx testmo automation:run:submit \
+          --instance "$TESTMO_URL" \
+          --project-id 1 \
+          --name "Playwright test run" \
+          --source "frontend" \
+          --results results/*.xml
+      env:
+        TESTMO_URL: ${{ secrets.TESTMO_URL }}
+        TESTMO_TOKEN: ${{ secrets.TESTMO_TOKEN }}
