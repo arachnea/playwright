@@ -82,7 +82,7 @@ const config = {
     [
       "junit",
       {
-        outputFile: "results/test-results.xml",
+        outputFile: "playwright-report/test-results.xml",
         embedAnnotationsAsProperties: true
 
         // Not used by Testmo
