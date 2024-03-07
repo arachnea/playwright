@@ -77,3 +77,18 @@ module.exports = defineConfig({
   // },
 });
 
+const config = {
+  reporter: [
+    [
+      "junit",
+      {
+        outputFile: "results/test-results.xml",
+        embedAnnotationsAsProperties: true
+
+        // Not used by Testmo
+        // embedAttachmentsAsProperty: undefined
+      }
+    ]
+  ]
+}
+export default config
